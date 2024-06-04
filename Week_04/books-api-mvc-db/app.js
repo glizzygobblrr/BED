@@ -7,8 +7,12 @@ const booksController = require("./controllers/booksController");
 const app = express();
 const port = process.env.PORT || 3000;
 
+const staticMiddleware = express.static("public"); // Path to the public folder
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(staticMiddleware); // Mounting staticMiddleware
 
 app.get("/books", booksController.getAllBooks);
 app.get("/books/:id", booksController.getBookById);
@@ -33,34 +37,9 @@ process.on("SIGINT", async () => {
   process.exit(0); // Exit with code 0 indicating successful shutdown
 });
 
-const express = require("express");
-const booksController = require("./controllers/booksController");
-const sql = require("mssql");
-const dbConfig = require("./dbConfig");
-const bodyParser = require("body-parser"); // Import body-parser
-
-
-// Include body-parser middleware to handle JSON data
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); // For form data handling
-
-app.get("/books", booksController.getAllBooks);
-app.get("/books/:id", booksController.getBookById);
-app.post("/books", validateBook, booksController.createBook); // POST for creating books (can handle JSON data)
-app.put("/books/:id", booksController.updateBook); // PUT for updating books
-app.delete("/books/:id", booksController.deleteBook); // DELETE for deleting books
-
-// ... existing code for database connection and graceful shutdown
-
-app.listen(port, async () => {
-  // ... existing code
-});
-
 //validation
 const validateBook = require("./middlewares/validateBook");
 
-// ... existing code
-
 app.post("/books", validateBook, booksController.createBook); // POST for creating books (can handle JSON data)
-app.put("/books/:id", validateBook, booksController.updateBook);
-
+app.put("/books/:id", booksController.updateBook); // PUT for updating books
+app.delete("/books/:id", booksController.deleteBook); // DELETE for deleting books
